@@ -1,5 +1,5 @@
 from state import State
-from player import RoguePlayer
+from rogue_player import RoguePlayer
 import graphics as gr
 
 
@@ -8,12 +8,17 @@ class RogueGame(State):
     player_class = RoguePlayer
 
     def __init__(self):
-        self.player = self.player_class()
+        pass
+
+
+    def set_map(self, level_class):
+        self.level = level_class()
+
 
 
     def set_level(self, level_class):
-        self.level = level_class()
-        gr.set_tiles(self.level.map, self.tiles_image)
+        self.level = level_class
+        gr.set_tiles(self.level.lvl, self.tiles_image)
 
 
     def update(self):
@@ -27,6 +32,6 @@ class RogueGame(State):
             if gr.process_events():
                 break
             self.run_state()
-            self.update()
+
             gr.draw_all()
         gr.quit()

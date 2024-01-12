@@ -1,11 +1,15 @@
 from sdl2 import *
+from sdl2.sdlttf import *
 import sdl2.ext
 from sprite import Sprite
 
-KEY_LEFT = SDLK_LEFT
-KEY_RIGHT = SDLK_RIGHT
-KEY_UP = SDLK_UP
+KEY_LEFT = SDLK_a
+KEY_RIGHT = SDLK_d
+KEY_UP = SDLK_w
+KEY_DOWN = SDLK_s
 KEY_SPACE = SDLK_SPACE
+KEY_1 = SDLK_1
+KEY_Q = SDLK_q
 
 RESOURCES = None
 SPRITES = ""
@@ -17,8 +21,8 @@ sprites = []
 keys = {}
 tile_map = None
 tiles = None
-tile_width = 8
-tile_height = 8
+tile_width = 60
+tile_height = 60
 tiles_count_w = 0
 tiles_count_h = 0
 
@@ -31,12 +35,12 @@ def init(width, height):
     window_height = height
     sdl2.ext.init()
     RESOURCES = sdl2.ext.Resources(__file__, SPRITES)
-    window = sdl2.ext.Window("Platformer", size=(window_width, window_height))
+    window = sdl2.ext.Window("WFTS", size=(window_width, window_height))
     window.show()
     renderer = SDL_CreateRenderer(window.window, -1, SDL_RENDERER_ACCELERATED)
 
 def set_tiles(tile_map_data, tiles_image):
-    global tile_map, tiles, tiles_count_w, tiles_count_h
+    global tile_map, tiles, tiles_count_w, tiles_count_h, colls
     tile_map = tile_map_data
     tiles = sdl2.ext.load_image(sdl2.ext.Resources(__file__, SPRITES).get_path(tiles_image))
     print('ren', renderer)
@@ -65,9 +69,9 @@ def add_sprite(sprite):
 def set_sprite(sprite_id, new_sprite):
     sprites[sprite_id] = new_sprite
 
-def remove_sprite(game_object):
-    if game_object.sprite in sprites:
-        sprites.remove(game_object.sprite)
+def remove_sprite(sprite):
+    if sprite in sprites:
+        sprites.remove(sprite)
 
 def clear():
     sprites.clear()
@@ -93,6 +97,13 @@ def draw_all():
 
     SDL_RenderPresent(renderer)
     sdl2.SDL_Delay(5)
+
+def text(text, color, size):
+    fontname = "fonts/pfont.ttf"
+    font = TTF_OpenFont(fontname.encode('utf-8'), size)
+    surface = TTF_RenderUTF8_Solid(font, text.encode('utf-8'), color)
+    texture = sdl2.SDL_CreateTextureFromSurface(renderer, surface)
+    return texture
 
 def process_events():
     """
@@ -124,8 +135,5 @@ def key_pressed(key):
 
 def quit():
     """
-    Завершает работу графической подсистемы SDL.
-
-    :return: None
+    Завершает работу графической под
     """
-    sdl2.ext.quit()

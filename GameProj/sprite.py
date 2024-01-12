@@ -20,7 +20,6 @@ class Sprite:
         self.start_y = start_y
         self.height = height
         self.width = width
-        self.flip_x = False
 
     def update(self):
         pass

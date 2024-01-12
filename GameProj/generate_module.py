@@ -1,7 +1,6 @@
 import random
 
 rooms = {
-    4: "4x4",
     5: "5x5",
     6: "6x6",
     7: "7x7",
@@ -14,25 +13,35 @@ rooms = {
 width = 0
 height = 0
 
+def gen_enemies(lvl):
+    en_map = [[0 for i in range(0, len(lvl))] for j in range(0, len(lvl))]
+    for i in range(0, len(lvl)):
+        for j in range(0, len(lvl[0])):
+            rand = random.randint(0, 10)
+            if lvl[i][j] != 0 and lvl[i][j] != 4 and lvl[i][j] != 2 and rand < 1:
+                en_map[i][j] = 1
+    return en_map
+
+
 def gen_lvl_enemies(map, x, y):
     size = rooms[map[x][y]].split('x')
     count_height = int(size[0])
     count_width = int(size[1])
     offset = -1
-    level = [['#' for i in range(0, count_width)] for j in range(0, count_height)]
+    level = [[0 for i in range(0, count_width)] for j in range(0, count_height)]
     for i in range(1, count_width - 1):
         for j in range(1, count_height - 1):
-            level[i][j] = '.'
+            level[i][j] = 1
     if round(map[x][y] / 2) < map[x][y] / 2:
         offset = 0
     if map[x - 1][y] != 0:
-        level[0][round(count_height / 2)] = '/'
+        level[0][round(count_height / 2)] = 2
     if map[x][y - 1] != 0:
-        level[round(count_width / 2)][0] = '/'
+        level[round(count_width / 2)][0] = 2
     if map[x + 1][y] != 0:
-        level[count_width - 1][round(count_height / 2)] = '/'
+        level[count_width - 1][round(count_height / 2)] = 2
     if map[x][y + 1] != 0:
-        level[round(count_width / 2)][count_height - 1] = '/'
+        level[round(count_width / 2)][count_height - 1] = 2
     enem_count = random.randint(2, round(x/2))
     while enem_count != 0:
         xen = random.randint(1, int(size[0]) - 2)
@@ -47,20 +56,20 @@ def gen_level(map, x, y):
     count_height = int(size[0])
     count_width = int(size[1])
     offset = -1
-    level = [['#' for i in range(0, count_width)] for j in range(0, count_height)]
+    level = [[0 for i in range(0, count_width)] for j in range(0, count_height)]
     for i in range(1, count_width - 1):
         for j in range(1, count_height - 1):
-            level[i][j] = '.'
+            level[i][j] = 1
     if round(map[x][y] / 2) < map[x][y] / 2:
         offset = 0
     if map[x - 1][y] != 0:
-        level[0][round(count_height / 2)] = '_'
+        level[0][round(count_height / 2)] = 2
     if map[x][y - 1] != 0:
-        level[round(count_width / 2)][0] = '_'
+        level[round(count_width / 2)][0] = 2
     if map[x + 1][y] != 0:
-        level[count_width - 1][round(count_height / 2)] = '_'
+        level[count_width - 1][round(count_height / 2)] = 2
     if map[x][y + 1] != 0:
-        level[round(count_width / 2)][count_height - 1] = '_'
+        level[round(count_width / 2)][count_height - 1] = 2
 
     return level
 
@@ -158,7 +167,3 @@ def direct_change(block_direction, map):
             width += upDown
             height += rightLeft
     return map
-
-
-print_level(gen_level(gen_map(20, 20), 10, 10))
-print_level(gen_map(30, 30))
