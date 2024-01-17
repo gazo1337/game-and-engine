@@ -7,6 +7,7 @@ class Player(RoguePlayer):
     speed_x = 2
     speed_y = 2
     attack = False
+    global_attack = False
     death_e = False
     s_frame = Sprite("spell_frame.png", 1070, 10, 120, 120)
 
@@ -68,6 +69,7 @@ class Player(RoguePlayer):
                 gr.remove_sprite(self.s_frame)
                 self.p_attack()
                 self.attack = True
+                self.global_attack = True
             if self.key_pressed(KEY_Q):
                 gr.remove_sprite(self.target)
                 gr.remove_sprite(self.s_frame)

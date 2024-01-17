@@ -1,4 +1,3 @@
-from sdl2.sdlttf import *
 from world import  World
 from rogue import RogueGame
 import graphics as gr
@@ -16,12 +15,14 @@ player_class.add_spell(Spell(Sprite("punch_icon.png", 1070, 10, 120, 120), 10))
 class WaitingGame(RogueGame):
     tiles_image = "tiles.png"
     texture = None
+    player_turn = False
+    enemy_turn = False
+    enemy_num = 0
 
     def __init__(self):
         super().__init__()
         gr.SPRITES = "models"
         gr.init(1200, 720)
-        TTF_Init()
         self.states = {
             'Intro': self.intro,
             'Game': self.game
@@ -35,14 +36,31 @@ class WaitingGame(RogueGame):
             gr.clear()
             self.set_level(world.thLevel)
             self.level.add_object(player_class)
+            world.add_object(player_class)
             player_class.set_spell()
 
-
     def game(self):
-        player_class.update()
+        if not player_class.global_attack:
+            player_class.update()
+        if len(world.thLevel.enemies) == 0:
+            player_class.global_attack = False
         if len(world.thLevel.enemies) == 0 and not world.thLevel.breaked:
             world.thLevel.break_doors()
+            world.remove_map_steps()
+            self.player_turn = False
             self.set_level(world.thLevel)
+        elif len(world.thLevel.enemies) > 0:
+            if not self.enemy_turn and not self.player_turn:
+                world.set_map_steps()
+                self.player_turn = True
+        if player_class.global_attack:
+            world.remove_map_steps()
+            self.player_turn = False
+            self.enemy_turn = True
+        if player_class.global_attack and not self.player_turn and self.enemy_turn:
+            world.thLevel.enemies_turn(player_class)
+            self.enemy_turn = False
+            player_class.global_attack = False
         new_pos = player_class.collision_with_triggers()
         if new_pos[0] != 0 or new_pos[1] != 0:
             world.level_change(new_pos)
@@ -59,10 +77,6 @@ class WaitingGame(RogueGame):
                 player_class.sprite.y = int(len(world.thLevel.lvl) / 2) * 60
             self.level.add_object(player_class)
             player_class.set_spell()
-
-
-
-
 
 
 if __name__ == "__main__":

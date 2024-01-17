@@ -2,13 +2,7 @@ import generate_module
 from graphics import *
 from enemy import Enemy
 from sprite import Sprite
-
-tiles = {
-        '#': 0, #Стены
-        '.': 1, #Полы
-        '/': 2, #Двери
-        '_': 4 #Триггеры
-    }
+import time
 
 class Level:
     tile_width = 60
@@ -47,15 +41,10 @@ class Level:
         self.step_map = [[9 for i in range(0, len(self.lvl))] for j in range(0, len(self.lvl))]
 
 
-
-
     def add_object(self, object):
         object.sprite_id = add_sprite(object.sprite)
         self.objects.append(object)
 
-    def enemies_update(self):
-        for i in range(0, len(self.enemies)):
-            self.enemies[i].update()
 
     def break_doors(self):
         for i in range(0, len(self.lvl)):
@@ -81,3 +70,38 @@ class Level:
             self.enemies.remove(enemy)
             return True
         return False
+
+    def enemies_turn(self, player):
+        player_x = int(player.x / tile_width)
+        player_y = int(player.y / tile_height)
+        for i in range(0, len(self.enemies)):
+            enemy_x = int(self.enemies[i].x/self.tile_width)
+            enemy_y = int(self.enemies[i].y/self.tile_height)
+            if (abs(player_x-enemy_x) == 1 and abs(player_y - enemy_y) == 0) or (abs(player_x-enemy_x) == 0 and abs(player_y - enemy_y) == 1):
+                self.enemies[i].damage(player)
+            else:
+                if player_x - enemy_x != 0:
+                    x_dist = int((player_x - enemy_x) / abs(player_x-enemy_x))
+                else:
+                    x_dist = 0
+                if player_y - enemy_y != 0:
+                    y_dist = int((player_y - enemy_y) / abs(player_y - enemy_y))
+                else:
+                    y_dist = 0
+                if x_dist != 0 and self.enemiesMap[enemy_y][enemy_x + x_dist] != 1:
+                    while self.enemies[i].x != (enemy_x + x_dist) * self.tile_width:
+                        self.enemies[i].velocity_x = x_dist
+                        self.enemies[i].update()
+                    self.enemies[i].velocity_x = 0
+                    self.enemiesMap[enemy_y][enemy_x] = 0
+                    self.enemiesMap[enemy_y][int(self.enemies[i].x/self.tile_width)] = 1
+                if y_dist != 0 and self.enemiesMap[enemy_y + y_dist][enemy_x] != 1:
+                    while self.enemies[i].y != (enemy_y + y_dist) * self.tile_height:
+                        self.enemies[i].velocity_y = y_dist
+                        self.enemies[i].update()
+                    self.enemies[i].velocity_y = 0
+                    self.enemiesMap[enemy_y][enemy_x] = 0
+                    self.enemiesMap[int(self.enemies[i].y / self.tile_height)][enemy_x] = 1
+                if (abs(player_x - enemy_x) == 1 and abs(player_y - enemy_y) == 0) or (
+                        abs(player_x - enemy_x) == 0 and abs(player_y - enemy_y) == 1):
+                    self.enemies[i].damage(player)

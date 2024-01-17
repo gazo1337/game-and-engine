@@ -4,13 +4,12 @@ from state import State
 class Enemy(State):
     anim = []
     animStep = 0
+    dmg = 2
 
-    def __init__(self, sprite, width, height, pos_x=0, pos_y=0, velocity_x=1, velocity_y=1):
+    def __init__(self, sprite, width, height, pos_x=0, pos_y=0, velocity_x=0, velocity_y=0):
         """
 
         Инициализирует объект Enemy.
-
-        :param world: Экземпляр класса, представляющий мир, в котором находится объект.
         :param sprite: Спрайт, связанный с объектом.
         :param width: Ширина объекта.
         :param height: Высота объекта.
@@ -29,3 +28,15 @@ class Enemy(State):
         self.velocity_x = velocity_x
         self.velocity_y = velocity_y
         self.health = 20
+
+    def update(self):
+        """
+        Обновляет состояние объекта GameObject.
+        """
+        self.x += self.velocity_x
+        self.sprite.x = self.x + 10
+        self.y += self.velocity_y
+        self.sprite.y = self.y + 10
+
+    def damage(self, player):
+        player.health -= self.dmg

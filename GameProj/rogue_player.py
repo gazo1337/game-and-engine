@@ -19,7 +19,6 @@ class RoguePlayer(State):
         :param pos_y: Начальная позиция по оси Y.
         :param velocity_x: Начальная скорость по оси X.
         :param velocity_y: Начальная скорость по оси Y.
-        :param fly: Флаг, указывающий, может ли объект летать (по умолчанию False).
         """
         super().__init__()
         self.world = world
@@ -38,20 +37,22 @@ class RoguePlayer(State):
         Обновляет состояние объекта GameObject.
         """
         # self.run_state()
-        self.x += self.velocity_x
-        self.y += self.velocity_y
         if self.velocity_x != 0 or self.velocity_y != 0:
             self.collision_with_wall()
         if (self.velocity_x != 0 or self.velocity_y != 0) and len(self.anim) > 1:
             graphics.remove_sprite(self.sprite)
             self.sprite = self.anim[self.animStep]
-            self.sprite.x = int(self.x) + self.velocity_x
+            self.x += self.velocity_x
+            self.y += self.velocity_y
+            self.sprite.x = int(self.x)
             self.sprite.y = int(self.y)
             self.animStep += 1
             graphics.add_sprite(self.sprite)
         elif self.velocity_x != 0 or self.velocity_y != 0:
             graphics.remove_sprite(self.sprite)
             self.sprite = self.anim[0]
+            self.x += self.velocity_x
+            self.y += self.velocity_y
             self.sprite.x = int(self.x)
             self.sprite.y = int(self.y)
             graphics.add_sprite(self.sprite)
@@ -61,10 +62,6 @@ class RoguePlayer(State):
             graphics.add_sprite(self.sprite)
         if self.animStep == (len(self.anim)):
             self.animStep = 0
-        # t_rect = sdl2.SDL_Rect(self.sprite.x, self.sprite.y, 0, 0)
-        # texture = graphics.text(str(self.health), sdl2.SDL_Color(255, 0, 0), 24)
-        # sdl2.SDL_RenderCopy(graphics.renderer, texture, None, ctypes.byref(t_rect))
-        # sdl2.SDL_RenderPresent(graphics.renderer)
 
     def collision_with_wall(self):
         """

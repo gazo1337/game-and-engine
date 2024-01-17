@@ -1,13 +1,12 @@
 import generate_module
 import graphics
-import graphics as g
-from level import  Level
+from level import Level
 
 tpos = {
-        1: [-1, 0], #Стены
-        2: [0, -1], #Полы
-        3: [0, 1], #Двери
-        4: [1, 0] #Триггеры
+        1: [-1, 0],
+        2: [0, -1],
+        3: [0, 1],
+        4: [1, 0]
     }
 
 class World:
@@ -101,7 +100,6 @@ class World:
             self.thLevel = self.world_lvls[len(self.world_lvls) - 1]
             graphics.clear()
             self.thLevel.set_enemies()
-            # self.set_map_steps()
         else:
             for i in range(0, len(self.world_lvls)):
                 if self.world_lvls[i].pos[0] == self.pos[0] and self.world_lvls[i].pos[1] == self.pos[1]:
@@ -109,13 +107,17 @@ class World:
                     self.thLevel = self.world_lvls[i]
                     graphics.clear()
 
-    # def set_map_steps(self):
-    #     for i in range(0, len(self.thLevel.lvl)):
-    #         for j in range(0, len(self.thLevel.lvl)):
-    #             if self.thLevel.lvl[i][j] != 0 and self.thLevel.lvl[i][j] != 4:
-    #                 if ((i == int(self.objects[0].sprite.y/60) or i == int(self.objects[0].sprite.y/60) + 1 or i == int(self.objects[0].sprite.y/60) - 1)
-    #                 and (j == int(self.objects[0].sprite.x/60) or j == int(self.objects[0].sprite.x/60) + 1 or j == int(self.objects[0].sprite.x/60) - 1)):
-    #                     self.thLevel.step_map[i][j] = 5
-    #                 else:
-    #                     self.thLevel.step_map[i][j] = 6
-    #     graphics.set_tiles(self.thLevel.step_map, "tiles.png")
+    def set_map_steps(self):
+        for i in range(0, len(self.thLevel.lvl)):
+            for j in range(0, len(self.thLevel.lvl)):
+                if self.thLevel.lvl[i][j] != 0 and self.thLevel.lvl[i][j] != 2:
+                    if ((i == int(self.objects[0].sprite.y/60) or i == int(self.objects[0].sprite.y/60) + 1 or i == int(self.objects[0].sprite.y/60) - 1)
+                    and (j == int(self.objects[0].sprite.x/60) or j == int(self.objects[0].sprite.x/60) + 1 or j == int(self.objects[0].sprite.x/60) - 1)):
+                        self.thLevel.step_map[i][j] = 5
+                    else:
+                        self.thLevel.step_map[i][j] = 6
+        graphics.set_other_tiles(self.thLevel.step_map, "tiles.png")
+
+    def remove_map_steps(self):
+        graphics.other_tile_map = None
+        self.thLevel.step_map = [[9 for i in range(0, len(self.thLevel.lvl))] for j in range(0, len(self.thLevel.lvl))]
