@@ -18,6 +18,7 @@ class WaitingGame(RogueGame):
     player_turn = False
     enemy_turn = False
     enemy_num = 0
+    i = 0
 
     def __init__(self):
         super().__init__()
@@ -53,14 +54,17 @@ class WaitingGame(RogueGame):
             if not self.enemy_turn and not self.player_turn:
                 world.set_map_steps()
                 self.player_turn = True
-        if player_class.global_attack:
+        if player_class.global_attack and not self.enemy_turn:
             world.remove_map_steps()
             self.player_turn = False
             self.enemy_turn = True
+            world.thLevel.distance(player_class)
         if player_class.global_attack and not self.player_turn and self.enemy_turn:
-            world.thLevel.enemies_turn(player_class)
-            self.enemy_turn = False
-            player_class.global_attack = False
+            self.i += world.thLevel.enemies_turn(player_class, self.i)
+            if self.i == len(world.thLevel.enemies):
+                self.enemy_turn = False
+                player_class.global_attack = False
+                self.i = 0
         new_pos = player_class.collision_with_triggers()
         if new_pos[0] != 0 or new_pos[1] != 0:
             world.level_change(new_pos)

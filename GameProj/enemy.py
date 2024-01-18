@@ -5,6 +5,12 @@ class Enemy(State):
     anim = []
     animStep = 0
     dmg = 2
+    x_move = False
+    y_move = False
+    x_dist = 0
+    y_dist = 0
+    start_x = 0
+    start_y = 0
 
     def __init__(self, sprite, width, height, pos_x=0, pos_y=0, velocity_x=0, velocity_y=0):
         """

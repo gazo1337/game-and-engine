@@ -66,42 +66,84 @@ class Level:
     def check_death(self, enemy):
         if enemy.health <= 0:
             remove_sprite(enemy.sprite)
-            self.enemiesMap[int(enemy.sprite.y / 60)][int(enemy.sprite.x / 60)] = 0
+            self.enemiesMap[int(enemy.y / tile_height)][int(enemy.x / tile_width)] = 0
             self.enemies.remove(enemy)
             return True
         return False
 
-    def enemies_turn(self, player):
+    def enemies_turn(self, player, i):
         player_x = int(player.x / tile_width)
         player_y = int(player.y / tile_height)
-        for i in range(0, len(self.enemies)):
-            enemy_x = int(self.enemies[i].x/self.tile_width)
-            enemy_y = int(self.enemies[i].y/self.tile_height)
-            if (abs(player_x-enemy_x) == 1 and abs(player_y - enemy_y) == 0) or (abs(player_x-enemy_x) == 0 and abs(player_y - enemy_y) == 1):
-                self.enemies[i].damage(player)
+        enemy_x = int(self.enemies[i].x / self.tile_width)
+        enemy_y = int(self.enemies[i].y / self.tile_height)
+        if self.enemies[i].y_dist != 0 and self.enemiesMap[self.enemies[i].start_y][self.enemies[i].start_x + self.enemies[i].x_dist] != 1 and not self.enemies[i].x_move:
+            if self.enemies[i].x != (self.enemies[i].start_x + self.enemies[i].x_dist) * self.tile_width:
+                self.enemies[i].velocity_x = self.enemies[i].x_dist
+                self.enemies[i].update()
+                return 0
             else:
-                if player_x - enemy_x != 0:
-                    x_dist = int((player_x - enemy_x) / abs(player_x-enemy_x))
-                else:
-                    x_dist = 0
-                if player_y - enemy_y != 0:
-                    y_dist = int((player_y - enemy_y) / abs(player_y - enemy_y))
-                else:
-                    y_dist = 0
-                if x_dist != 0 and self.enemiesMap[enemy_y][enemy_x + x_dist] != 1:
-                    while self.enemies[i].x != (enemy_x + x_dist) * self.tile_width:
-                        self.enemies[i].velocity_x = x_dist
-                        self.enemies[i].update()
-                    self.enemies[i].velocity_x = 0
-                    self.enemiesMap[enemy_y][enemy_x] = 0
-                    self.enemiesMap[enemy_y][int(self.enemies[i].x/self.tile_width)] = 1
-                if y_dist != 0 and self.enemiesMap[enemy_y + y_dist][enemy_x] != 1:
-                    while self.enemies[i].y != (enemy_y + y_dist) * self.tile_height:
-                        self.enemies[i].velocity_y = y_dist
-                        self.enemies[i].update()
-                    self.enemies[i].velocity_y = 0
-                    self.enemiesMap[enemy_y][enemy_x] = 0
-                    self.enemiesMap[int(self.enemies[i].y / self.tile_height)][enemy_x] = 1
-                if (abs(player_x - enemy_x) == 1 and abs(player_y - enemy_y) == 0) or (
-                        abs(player_x - enemy_x) == 0 and abs(player_y - enemy_y) == 1):
-                    self.enemies[i].damage(player)
+                self.enemies[i].velocity_x = 0
+                self.enemiesMap[self.enemies[i].start_y][self.enemies[i].start_x] = 0
+                self.enemiesMap[enemy_y][int(self.enemies[i].x/self.tile_width)] = 1
+                self.enemies[i].x_move = True
+        elif abs(player_x - self.enemies[i].start_x) > 1 and self.enemiesMap[self.enemies[i].start_y][self.enemies[i].start_x + self.enemies[i].x_dist] != 1 and not self.enemies[i].x_move:
+            if self.enemies[i].x != (self.enemies[i].start_x + self.enemies[i].x_dist) * self.tile_width:
+                self.enemies[i].velocity_x = self.enemies[i].x_dist
+                self.enemies[i].update()
+                return 0
+            else:
+                self.enemies[i].velocity_x = 0
+                self.enemiesMap[self.enemies[i].start_y][self.enemies[i].start_x] = 0
+                self.enemiesMap[enemy_y][int(self.enemies[i].x/self.tile_width)] = 1
+                self.enemies[i].x_move = True
+        else:
+            self.enemies[i].x_move = True
+        if player_x - enemy_x != 0:
+            self.enemies[i].x_dist = int((player_x - enemy_x) / abs(player_x - enemy_x))
+        else:
+            self.enemies[i].x_dist = 0
+        if self.enemies[i].x_dist != 0 and self.enemiesMap[self.enemies[i].start_y + self.enemies[i].y_dist][enemy_x] != 1 and not self.enemies[i].y_move:
+            if self.enemies[i].y != (self.enemies[i].start_y + self.enemies[i].y_dist) * self.tile_height:
+                self.enemies[i].velocity_y = self.enemies[i].y_dist
+                self.enemies[i].update()
+                return 0
+            else:
+                self.enemies[i].velocity_y = 0
+                self.enemiesMap[self.enemies[i].start_y][self.enemies[i].start_x] = 0
+                self.enemiesMap[int(self.enemies[i].y / self.tile_height)][enemy_x] = 1
+                self.enemies[i].y_move = True
+        elif abs(player_y - self.enemies[i].start_y) > 1 and self.enemiesMap[self.enemies[i].start_y + self.enemies[i].y_dist][enemy_x] != 1 and not self.enemies[i].y_move:
+            if self.enemies[i].y != (self.enemies[i].start_y + self.enemies[i].y_dist) * self.tile_height:
+                self.enemies[i].velocity_y = self.enemies[i].y_dist
+                self.enemies[i].update()
+                return 0
+            else:
+                self.enemies[i].velocity_y = 0
+                self.enemiesMap[self.enemies[i].start_y][self.enemies[i].start_x] = 0
+                self.enemiesMap[int(self.enemies[i].y / self.tile_height)][enemy_x] = 1
+                self.enemies[i].y_move = True
+        else:
+            self.enemies[i].y_move = True
+        if (abs(player_x - enemy_x) == 1 and abs(player_y - enemy_y) == 0) or (
+                abs(player_x - enemy_x) == 0 and abs(player_y - enemy_y) == 1):
+            self.enemies[i].damage(player)
+        self.enemies[i].x_move = False
+        self.enemies[i].y_move = False
+        return 1
+
+    def distance(self, player):
+        for i in range(0, len(self.enemies)):
+            player_x = int(player.x / tile_width)
+            player_y = int(player.y / tile_height)
+            enemy_x = int(self.enemies[i].x / self.tile_width)
+            enemy_y = int(self.enemies[i].y / self.tile_height)
+            if player_x - enemy_x != 0:
+                self.enemies[i].x_dist = int((player_x - enemy_x) / abs(player_x - enemy_x))
+            else:
+                self.enemies[i].x_dist = 0
+            if player_y - enemy_y != 0:
+                self.enemies[i].y_dist = int((player_y - enemy_y) / abs(player_y - enemy_y))
+            else:
+                self.enemies[i].y_dist = 0
+            self.enemies[i].start_x = int(self.enemies[i].x / self.tile_width)
+            self.enemies[i].start_y = int(self.enemies[i].y / self.tile_height)
